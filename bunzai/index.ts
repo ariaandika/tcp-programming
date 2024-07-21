@@ -30,7 +30,10 @@ const tcp = Bun.listen({
     port: getPort(),
     socket: {
         data(socket, data) {
-
+            console.log(data.toString());
+            Bun.sleepSync(1000);
+            socket.write("Nutz");
+            socket.end()
         },
     },
 })
