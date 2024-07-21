@@ -1,5 +1,6 @@
-import socket
-import subprocess as ps
+from asyncio.streams import StreamReader, StreamWriter
+from asyncio.tasks import sleep
+import asyncio, subprocess as ps
 
 def getPort():
     ss = ps.run(["ss","-tln"],stdout=ps.PIPE)
@@ -20,20 +21,19 @@ def getPort():
     print("No Port Available")
     exit(1)
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    # Prevent socket still alive on exit
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+# https://stackoverflow.com/questions/48506460/python-simple-socket-client-server-using-asyncio
+async def server():
+    (host, port) = getPort()
+    server = await asyncio.start_server(handler,host=host,port=int(port))
+    print(f'Listening {host}:{port}')
+    async with server:
+        await server.serve_forever()
 
-    s.bind(getPort())
-    s.listen()
+async def handler(reader: StreamReader, writer: StreamWriter):
+    print((await reader.read(255)).decode())
+    await sleep(1)
+    writer.write(b"IOC")
+    writer.close()
 
-    (addr, port) = s.getsockname()
-    print(f"Listening {addr}:{port}")
-
-    conn, addr = s.accept()
-
-    with conn:
-        data = conn.recv(5)
-
-        print(data)
+asyncio.run(server())
 
