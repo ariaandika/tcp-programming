@@ -19,6 +19,15 @@ where the message come from.
 
 # Port Discoveries
 
+there is 2 options, currently option 1 is used
+
+## Option 1, use core utils
+
+using `ss -tln` to list listening tcp ports, then find
+ports between 4000 to 4020 where its not used
+
+## Option 2, brute force
+
 when a single program spin up, it will try to
 bind to port 4000, if it fail, retry with 4001
 and so on.
