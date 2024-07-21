@@ -29,9 +29,9 @@ const tcp = Bun.listen({
     hostname: "127.0.0.1",
     port: getPort(),
     socket: {
-        data(socket, data) {
+        async data(socket, data) {
             console.log(data.toString());
-            Bun.sleepSync(1000);
+            await Bun.sleep(1000);
             socket.write("Nutz");
             socket.end()
         },
